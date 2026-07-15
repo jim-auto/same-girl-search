@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture | same-girl-search</title>
+    <meta name="description" content="same-girl-search MVP architecture notes." />
+    <link rel="stylesheet" href="./assets/site.css" />
+  </head>
+  <body>
+    <header class="docHeader">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./">same-girl-search</a>
+        <div class="navLinks">
+          <a href="./#features">Features</a>
+          <a href="./#quickstart">Quick Start</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="docPage">
+      <p class="eyebrow">Architecture Notes</p>
+      <h1>小さく始めて、壊さず広げる</h1>
+      <p>
+        MVP は、画像フォルダから embedding を作り、SQLite と FAISS に保存し、FastAPI と Next.js UI から検索する直接的な構成です。
+      </p>
+
+      <h2>Module Ownership</h2>
+      <ul>
+        <li><code>libs/embedding</code>: model loading, face detection, normalized embedding output</li>
+        <li><code>libs/vector_search</code>: FAISS persistence and ID mapping</li>
+        <li><code>apps/api</code>: HTTP, SQLite persistence, ingestion orchestration, deletion</li>
+        <li><code>apps/web</code>: query upload and result rendering</li>
+        <li><code>libs/crawler</code>: lawful crawler policy, robots checks, future source adapters</li>
+      </ul>
+
+      <h2>Index Contract</h2>
+      <ol>
+        <li>SQLite <code>images.id</code> is the canonical ID.</li>
+        <li>FAISS row IDs map to SQLite IDs through a JSON sidecar file.</li>
+        <li>Embeddings are normalized before insertion, so FAISS inner product equals cosine similarity.</li>
+      </ol>
+
+      <h2>Rebuild Strategy</h2>
+      <p>
+        If a record is deleted or the FAISS sidecar is missing, rebuild FAISS from SQLite embeddings. This keeps deletion simple and avoids early over-abstraction.
+      </p>
+
+      <pre><code>POST /admin/rebuild-faiss</code></pre>
+    </main>
+
+    <footer>
+      <span>same-girl-search</span>
+      <a href="./">Back to project page</a>
+    </footer>
+  </body>
+</html>

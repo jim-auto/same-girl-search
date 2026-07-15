@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>same-girl-search</title>
+    <meta
+      name="description"
+      content="画像から同一人物の可能性が高いプロフィールをローカル横断検索する OSS MVP。"
+    />
+    <link rel="stylesheet" href="./assets/site.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./">same-girl-search</a>
+        <div class="navLinks">
+          <a href="#features">Features</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#quickstart">Quick Start</a>
+          <a href="https://github.com/" id="repoLink">GitHub</a>
+        </div>
+      </nav>
+
+      <section class="heroGrid">
+        <div class="heroCopy">
+          <p class="eyebrow">Local-first face similarity search</p>
+          <h1>画像から重複候補プロフィールを横断検索する OSS MVP</h1>
+          <p class="lead">
+            InsightFace で embedding を作成し、SQLite と FAISS に保存して、FastAPI と Next.js UI から top-k 類似候補を確認できます。
+          </p>
+          <div class="actions">
+            <a class="button primary" href="#quickstart">Run locally</a>
+            <a class="button secondary" href="./architecture.html">Architecture notes</a>
+          </div>
+        </div>
+
+        <div class="productPanel" aria-label="Search result preview">
+          <div class="uploadBox">
+            <div class="imageIcon"></div>
+            <span>query image</span>
+          </div>
+          <div class="resultList">
+            <div class="resultItem strong">
+              <span class="thumb"></span>
+              <div>
+                <strong>#1 score 0.8421</strong>
+                <small>site-a / shop-1 / profile</small>
+              </div>
+            </div>
+            <div class="resultItem">
+              <span class="thumb alt"></span>
+              <div>
+                <strong>#2 score 0.7914</strong>
+                <small>site-b / shop-3 / profile</small>
+              </div>
+            </div>
+            <div class="resultItem">
+              <span class="thumb muted"></span>
+              <div>
+                <strong>#3 score 0.7328</strong>
+                <small>site-c / shop-2 / profile</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="band" id="features">
+        <div class="sectionHead">
+          <p class="eyebrow">MVP Scope</p>
+          <h2>まず実データで動く構成</h2>
+        </div>
+        <div class="cards">
+          <article>
+            <h3>Image Embedding</h3>
+            <p>InsightFace と onnxruntime で顔検出、最大顔の normalized embedding、bbox、検出 score を生成します。</p>
+          </article>
+          <article>
+            <h3>Similarity Search</h3>
+            <p>FAISS の inner product index に正規化済み vector を保存し、cosine similarity として検索します。</p>
+          </article>
+          <article>
+            <h3>Metadata Storage</h3>
+            <p>SQLite に画像パス、source site、shop name、profile URL、bbox、embedding を保存します。</p>
+          </article>
+          <article>
+            <h3>Duplicate Viewer</h3>
+            <p>Next.js UI で画像をアップロードし、score と source metadata 付きの top-k 候補を確認します。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="band contrast" id="architecture">
+        <div class="sectionHead">
+          <p class="eyebrow">Architecture</p>
+          <h2>小さく始めて後から広げる</h2>
+        </div>
+        <div class="flow">
+          <div>Image folder</div>
+          <span></span>
+          <div>InsightFace</div>
+          <span></span>
+          <div>SQLite + FAISS</div>
+          <span></span>
+          <div>FastAPI</div>
+          <span></span>
+          <div>Next.js UI</div>
+        </div>
+        <pre><code>/apps
+  /web
+  /api
+/libs
+  /embedding
+  /vector_search
+  /crawler
+/data
+/docs</code></pre>
+      </section>
+
+      <section class="band" id="quickstart">
+        <div class="sectionHead">
+          <p class="eyebrow">Quick Start</p>
+          <h2>Docker でローカル実行</h2>
+        </div>
+        <div class="terminal">
+          <code>docker compose up --build</code>
+          <code>docker compose run --rm api python scripts/index_folder.py --image-dir /workspace/data/images --site local --shop default</code>
+        </div>
+        <div class="links">
+          <a href="http://localhost:3000">Web UI: localhost:3000</a>
+          <a href="http://localhost:8000/docs">API docs: localhost:8000/docs</a>
+        </div>
+      </section>
+
+      <section class="band caution">
+        <div class="sectionHead">
+          <p class="eyebrow">Responsible Use</p>
+          <h2>lawful / ethical scraping を前提にする</h2>
+        </div>
+        <ul>
+          <li>Terms of Service と robots.txt を確認する</li>
+          <li>rate limit と User-Agent を必ず設定する</li>
+          <li>個人情報の過剰保存を避け、削除しやすい構造にする</li>
+          <li>検索結果は候補であり、同一人物と断定しない</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <span>same-girl-search</span>
+      <span>Local-first OSS MVP</span>
+    </footer>
+    <script src="./assets/site.js"></script>
+  </body>
+</html>
